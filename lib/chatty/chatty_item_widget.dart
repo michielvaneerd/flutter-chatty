@@ -2,10 +2,13 @@ import 'package:chatty/chatty/chatty_widget_cubit.dart';
 import 'package:chatty/chatty/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 class ChattyItemWidget extends StatelessWidget {
   const ChattyItemWidget({super.key, required this.item});
   final ChattyItem item;
+
+  static final dateFormat = DateFormat('y-MM-dd');
 
   static const _customInputQuestionTypes = [
     ChattyQuestionType.date,
@@ -24,12 +27,26 @@ class ChattyItemWidget extends StatelessWidget {
       case ChattyQuestionType.date:
         return [
           FilledButton(
-            onPressed: () {
-              // TODO: Display datepicker and get date
-              final date = DateTime.now();
-              BlocProvider.of<ChattyWidgetCubit>(
-                context,
-              ).prompt(date.toString());
+            onPressed: () async {
+              final minDate = item.question?.min != null
+                  ? dateFormat.parse(item.question!.min!)
+                  : DateTime.now();
+              final maxDate = item.question?.max != null
+                  ? dateFormat.parse(item.question!.max!)
+                  : DateTime.now();
+
+              final date = await showDatePicker(
+                context: context,
+                firstDate: minDate,
+                lastDate: maxDate,
+              );
+
+              if (date != null && context.mounted) {
+                BlocProvider.of<ChattyWidgetCubit>(context).prompt(
+                  DateFormat.yMd().format(date),
+                  value: dateFormat.format(date),
+                );
+              }
             },
             child: Text('Enter date'),
           ),

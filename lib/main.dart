@@ -10,7 +10,7 @@ final List<ChattyItem> myItems = [
   ),
   ChattyItem.fromAssistant(
     'Date?',
-    question: ChattyQuestion(type: ChattyQuestionType.date),
+    question: ChattyQuestion(type: ChattyQuestionType.date, min: '2000-01-01'),
   ),
   ChattyItem.fromAssistant(
     'Gender?',
