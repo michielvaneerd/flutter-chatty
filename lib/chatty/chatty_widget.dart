@@ -7,7 +7,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// ChattyWidget is the main widget that contains the chat items and the textfield for the prompt.
 class ChattyWidget extends StatefulWidget {
-  const ChattyWidget({super.key, required this.onPrompt, this.initialItems});
+  const ChattyWidget({
+    super.key,
+    required this.onPrompt,
+    this.initialItems,
+    this.withDateSeparator = false,
+  });
 
   static const paddingDefault = 12.0;
   static const paddingSmall = 6.0;
@@ -18,6 +23,7 @@ class ChattyWidget extends StatefulWidget {
   /// return the response as a ChattyItem - this is up to the caller.
   final Future<ChattyItem> Function(String prompt, {String? value}) onPrompt;
   final List<ChattyItem>? initialItems;
+  final bool withDateSeparator;
 
   @override
   State<ChattyWidget> createState() => _ChattyWidgetState();
@@ -45,24 +51,19 @@ class _ChattyWidgetState extends State<ChattyWidget> {
         },
         builder: (context, state) {
           final cubit = BlocProvider.of<ChattyWidgetCubit>(context);
-          final itemCount = state.items.length;
           return Column(
             children: [
               Expanded(
                 child: ListView.builder(
                   reverse: true,
-                  itemCount: itemCount + (state.busy ? 1 : 0),
+                  itemCount: state.items.length,
                   itemBuilder: (context, index) {
-                    if (state.busy && index == 0) {
-                      return ChattyItemWidget(
-                        item: ChattyItem.fromAssistant(''),
-                        extraWidget: ChattyAnimatedDots(),
-                      );
-                    } else {
-                      return ChattyItemWidget(
-                        item: state.items[index - (state.busy ? 1 : 0)],
-                      );
-                    }
+                    return ChattyItemWidget(
+                      item: state.items[index],
+                      extraWidget: index == 0 && state.busy
+                          ? ChattyAnimatedDots()
+                          : null,
+                    );
                   },
                 ),
               ),

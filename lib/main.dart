@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         body: SafeArea(
           minimum: EdgeInsets.all(20),
-          child: ChattyWidget(onPrompt: onPrompt),
+          child: ChattyWidget(onPrompt: onPrompt, withDateSeparator: true),
         ),
       ),
     );

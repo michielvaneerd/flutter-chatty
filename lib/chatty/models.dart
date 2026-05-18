@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-enum ChattyItemSource { user, assistant }
+enum ChattyItemSource { user, assistant, dateSeparator }
 
 enum ChattyQuestionType { none, text, int, email, date, singleChoice }
 
@@ -48,6 +48,14 @@ class ChattyItem extends Equatable {
     this.error,
     required this.createdAt,
   });
+
+  factory ChattyItem.fromDateSeparator(DateTime createdAt) {
+    return ChattyItem(
+      content: '',
+      source: ChattyItemSource.dateSeparator,
+      createdAt: createdAt,
+    );
+  }
 
   factory ChattyItem.fromUser(String content, {DateTime? createdAt}) {
     return ChattyItem(

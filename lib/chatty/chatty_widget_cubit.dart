@@ -29,14 +29,23 @@ class ChattyWidgetState extends Equatable {
 }
 
 class ChattyWidgetCubit extends Cubit<ChattyWidgetState> {
-  ChattyWidgetCubit({required this.onPrompt, this.initialItems})
-    : super(ChattyWidgetState(items: initialItems ?? []));
+  ChattyWidgetCubit({
+    required this.onPrompt,
+    this.initialItems,
+    this.withDateSeparator = false,
+  }) : super(ChattyWidgetState(items: initialItems ?? []));
   final Future<ChattyItem> Function(String content, {String? value}) onPrompt;
   final List<ChattyItem>? initialItems;
+  final bool withDateSeparator;
 
   /// Handle new user prompt
   void prompt(String prompt, {String? value}) async {
     List<ChattyItem> newItems = List.from(state.items);
+
+    if (withDateSeparator) {
+      // Loop through ALL items and get each unique date and store it with the index.
+      // TODO
+    }
 
     if (state.items.isNotEmpty && state.items.first.question != null) {
       // This is an answer to this question. We remove the question from this item,
@@ -47,10 +56,22 @@ class ChattyWidgetCubit extends Cubit<ChattyWidgetState> {
     // Add the user answer to the items
     newItems.insert(0, ChattyItem.fromUser(prompt));
 
+    // Add the "thinking" assistant message
+    newItems.insert(
+      0,
+      ChattyItem.fromAssistant(''),
+    ); // Empty assistant message is thinking
+
     emit(state.copyWith(busy: true, items: newItems));
 
     final response = await onPrompt(prompt, value: value);
 
-    emit(state.copyWith(items: List.from(state.items)..insert(0, response)));
+    emit(
+      state.copyWith(
+        items: List.from(state.items)
+          ..removeAt(0) // Remove the thinking assistant message first
+          ..insert(0, response), // Then add the response assistant message
+      ),
+    );
   }
 }
