@@ -1,3 +1,4 @@
+import 'package:chatty/chatty/chatty_animated_dots.dart';
 import 'package:chatty/chatty/chatty_item_widget.dart';
 import 'package:chatty/chatty/chatty_widget_cubit.dart';
 import 'package:chatty/chatty/models.dart';
@@ -49,7 +50,8 @@ class _ChattyWidgetState extends State<ChattyWidget> {
                   itemBuilder: (context, index) {
                     if (state.busy && index == 0) {
                       return ChattyItemWidget(
-                        item: ChattyItem.fromAssistant('...'),
+                        item: ChattyItem.fromAssistant(''),
+                        extraWidget: ChattyAnimatedDots(),
                       );
                     } else {
                       return ChattyItemWidget(

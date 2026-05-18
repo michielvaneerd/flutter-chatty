@@ -3,9 +3,9 @@ import 'package:chatty/chatty/models.dart';
 import 'package:flutter/material.dart';
 
 final List<ChattyItem> myItems = [
-  ChattyItem.fromAssistant('Hi, I am the assistant!'),
+  ChattyItem.fromAssistant('Hi, I am <b><i>the</i> assistant</b>!'),
   ChattyItem.fromAssistant(
-    'Whats your name?',
+    'Whats your <b>name</b>?',
     question: ChattyQuestion(type: ChattyQuestionType.text),
   ),
   ChattyItem.fromAssistant(

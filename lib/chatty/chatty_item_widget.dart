@@ -1,3 +1,4 @@
+import 'package:chatty/chatty/chatty_rich_text.dart';
 import 'package:chatty/chatty/chatty_widget_cubit.dart';
 import 'package:chatty/chatty/models.dart';
 import 'package:flutter/material.dart';
@@ -5,8 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class ChattyItemWidget extends StatelessWidget {
-  const ChattyItemWidget({super.key, required this.item});
+  const ChattyItemWidget({super.key, required this.item, this.extraWidget});
   final ChattyItem item;
+  final Widget? extraWidget;
 
   static final dateFormat = DateFormat('y-MM-dd');
 
@@ -71,6 +73,7 @@ class ChattyItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mainText = item.getMainContent();
     return Padding(
       padding: EdgeInsets.only(
         bottom: 10,
@@ -101,8 +104,9 @@ class ChattyItemWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(item.getMainContent()),
+            if (mainText.isNotEmpty) ChattyRichText(text: mainText),
             ...getAnswers(context),
+            ?extraWidget,
             if (item.error != null)
               Text(
                 item.error!,
