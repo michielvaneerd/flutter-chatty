@@ -21,62 +21,69 @@ class ChattyItemWidget extends StatelessWidget {
 
   static final dateFormat = DateFormat('y-MM-dd');
 
-  static const _customInputQuestionTypes = [
+  static const _embeddedInputQuestionTypes = [
     ChattyQuestionType.date,
     ChattyQuestionType.singleChoice,
   ];
 
-  static bool hasCustomInput(ChattyQuestionType type) {
-    return _customInputQuestionTypes.contains(type);
+  static bool hasEmbeddedInput(ChattyQuestionType type) {
+    return _embeddedInputQuestionTypes.contains(type);
   }
 
-  List<Widget> getAnswers(BuildContext context) {
+  Column? getAnswers(BuildContext context) {
     if (item.question == null) {
-      return [];
+      return null;
     }
     switch (item.question!.type) {
       case ChattyQuestionType.date:
-        return [
-          FilledButton(
-            onPressed: () async {
-              final minDate = item.question?.min != null
-                  ? dateFormat.parse(item.question!.min!)
-                  : DateTime.now();
-              final maxDate = item.question?.max != null
-                  ? dateFormat.parse(item.question!.max!)
-                  : DateTime.now();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FilledButton(
+              onPressed: () async {
+                final minDate = item.question?.min != null
+                    ? dateFormat.parse(item.question!.min!)
+                    : DateTime.now();
+                final maxDate = item.question?.max != null
+                    ? dateFormat.parse(item.question!.max!)
+                    : DateTime.now();
 
-              final date = await showDatePicker(
-                context: context,
-                firstDate: minDate,
-                lastDate: maxDate,
-              );
-
-              if (date != null && context.mounted) {
-                BlocProvider.of<ChattyWidgetCubit>(context).prompt(
-                  DateFormat.yMd().format(date),
-                  value: dateFormat.format(date),
+                final date = await showDatePicker(
+                  context: context,
+                  firstDate: minDate,
+                  lastDate: maxDate,
                 );
-              }
-            },
-            child: Text('Enter date'),
-          ),
-        ];
+
+                if (date != null && context.mounted) {
+                  BlocProvider.of<ChattyWidgetCubit>(context).prompt(
+                    DateFormat.yMd().format(date),
+                    value: dateFormat.format(date),
+                  );
+                }
+              },
+              child: Text('Enter date'),
+            ),
+          ],
+        );
       case ChattyQuestionType.singleChoice:
-        return item.question!.answers!
-            .map(
-              (e) => FilledButton(
-                onPressed: () {
-                  BlocProvider.of<ChattyWidgetCubit>(
-                    context,
-                  ).prompt(e.content, value: e.value);
-                },
-                child: Text(e.content),
-              ),
-            )
-            .toList();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: item.question!.answers!
+              .map(
+                (e) => FilledButton(
+                  onPressed: () {
+                    BlocProvider.of<ChattyWidgetCubit>(
+                      context,
+                    ).prompt(e.content, value: e.value);
+                  },
+                  child: Text(e.content),
+                ),
+              )
+              .toList(),
+        );
+
       default:
-        return [];
+        return null;
     }
   }
 
@@ -118,7 +125,7 @@ class ChattyItemWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (mainText.isNotEmpty) ChattyRichText(text: mainText),
-            ...getAnswers(context),
+            ?getAnswers(context),
             ?extraWidget,
             if (withDocuments && item.documents != null)
               Column(

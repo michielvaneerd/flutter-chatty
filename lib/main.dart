@@ -13,6 +13,15 @@ final List<ChattyItem> myItems = [
     question: ChattyQuestion(type: ChattyQuestionType.text),
   ),
   ChattyItem.fromAssistant(
+    'Whats your <b>age</b>?',
+    createdAt: DateTime(2026, 5, 15, 10, 30),
+    question: ChattyQuestion(
+      type: ChattyQuestionType.int,
+      min: '18',
+      max: '100',
+    ),
+  ),
+  ChattyItem.fromAssistant(
     'Date?',
     createdAt: DateTime(2026, 5, 16, 12, 30),
     question: ChattyQuestion(type: ChattyQuestionType.date, min: '2000-01-01'),
@@ -103,6 +112,7 @@ class MyApp extends StatelessWidget {
         body: SafeArea(
           minimum: EdgeInsets.all(20),
           child: ChattyWidget(
+            promptPlaceHolder: 'Ask your question...',
             onPrompt: onPrompt,
             withDateSeparator: true,
             withDocuments: true,

@@ -16,6 +16,7 @@ class ChattyWidget extends StatefulWidget {
     this.withDocuments = false,
     this.themeData,
     this.onDocumentClicked,
+    this.promptPlaceHolder,
   });
 
   static const paddingDefault = 12.0;
@@ -31,6 +32,7 @@ class ChattyWidget extends StatefulWidget {
   final bool withDocuments;
   final ThemeData? themeData;
   final void Function(String)? onDocumentClicked;
+  final String? promptPlaceHolder;
 
   @override
   State<ChattyWidget> createState() => _ChattyWidgetState();
@@ -57,10 +59,19 @@ class _ChattyWidgetState extends State<ChattyWidget> {
         ),
         child: BlocConsumer<ChattyWidgetCubit, ChattyWidgetState>(
           listener: (context, state) {
-            // TODO: implement listener
+            // TODO
           },
           builder: (context, state) {
             final cubit = BlocProvider.of<ChattyWidgetCubit>(context);
+            final currentItemQuestion = state.items.isNotEmpty
+                ? state.items.first.question
+                : null;
+            final textFieldEnabled =
+                !(state.busy ||
+                    (currentItemQuestion != null &&
+                        ChattyItemWidget.hasEmbeddedInput(
+                          currentItemQuestion.type,
+                        )));
             return Column(
               children: [
                 Expanded(
@@ -94,20 +105,20 @@ class _ChattyWidgetState extends State<ChattyWidget> {
                 SizedBox(height: ChattyWidget.paddingDefault),
                 TextField(
                   decoration: InputDecoration(
+                    hintText: widget.promptPlaceHolder,
                     suffixIcon: IconButton(
-                      onPressed:
-                          state.busy ||
-                              (state.items.isNotEmpty &&
-                                  state.items.first.question != null &&
-                                  ChattyItemWidget.hasCustomInput(
-                                    state.items.first.question!.type,
-                                  ))
-                          ? null
-                          : () {
+                      onPressed: textFieldEnabled
+                          ? () {
                               cubit.prompt(promptController.text);
                               promptController.clear();
-                            },
-                      icon: Icon(Icons.arrow_forward_ios),
+                            }
+                          : null,
+                      icon: Icon(
+                        Icons.arrow_forward_ios,
+                        color: !textFieldEnabled
+                            ? Theme.of(context).colorScheme.inversePrimary
+                            : null,
+                      ),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
