@@ -1,4 +1,5 @@
 import 'package:chatty/chatty/chatty_rich_text.dart';
+import 'package:chatty/chatty/chatty_widget.dart';
 import 'package:chatty/chatty/chatty_widget_cubit.dart';
 import 'package:chatty/chatty/models.dart';
 import 'package:flutter/material.dart';
@@ -76,44 +77,67 @@ class ChattyItemWidget extends StatelessWidget {
     final mainText = item.getMainContent();
     return Padding(
       padding: EdgeInsets.only(
-        bottom: 10,
-        left: item.source == ChattyItemSource.assistant ? 10 : 40,
-        right: item.source == ChattyItemSource.user ? 10 : 40,
+        bottom: ChattyWidget.paddingDefault,
+        left: item.source == ChattyItemSource.assistant
+            ? 0
+            : ChattyWidget.paddingBig,
+        right: item.source == ChattyItemSource.user
+            ? 0
+            : ChattyWidget.paddingBig,
       ),
       child: Container(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.all(ChattyWidget.paddingDefault),
         decoration: BoxDecoration(
           border: Border.all(
-            color: item.error == null ? Colors.black : Colors.red,
+            color: Theme.of(context).colorScheme.outline,
             width: 1,
           ),
           borderRadius: BorderRadius.only(
-            topRight: Radius.circular(10),
-            topLeft: Radius.circular(10),
+            topRight: Radius.circular(ChattyWidget.borderRadiusDefault),
+            topLeft: Radius.circular(ChattyWidget.borderRadiusDefault),
             bottomRight: item.source == ChattyItemSource.assistant
-                ? Radius.circular(10)
+                ? Radius.circular(ChattyWidget.borderRadiusDefault)
                 : Radius.zero,
             bottomLeft: item.source == ChattyItemSource.user
-                ? Radius.circular(10)
+                ? Radius.circular(ChattyWidget.borderRadiusDefault)
                 : Radius.zero,
           ),
           color: item.source == ChattyItemSource.assistant
-              ? Colors.limeAccent
-              : Colors.white,
+              ? Theme.of(context).colorScheme.primaryContainer
+              : Theme.of(context).colorScheme.surfaceContainerLowest,
         ),
         child: Column(
+          spacing: ChattyWidget.paddingDefault,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (mainText.isNotEmpty) ChattyRichText(text: mainText),
             ...getAnswers(context),
             ?extraWidget,
             if (item.error != null)
-              Text(
-                item.error!,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium!.copyWith(color: Colors.red),
+              Row(
+                spacing: ChattyWidget.paddingDefault,
+                children: [
+                  Icon(
+                    Icons.warning,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  Flexible(
+                    child: Text(
+                      item.error!,
+                      //style: TextStyle(color: )
+                    ),
+                  ),
+                ],
               ),
+            Align(
+              alignment: AlignmentGeometry.bottomEnd,
+              child: Text(
+                DateFormat.Hm().format(item.createdAt),
+                style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              ),
+            ),
           ],
         ),
       ),

@@ -3,13 +3,18 @@ import 'package:chatty/chatty/models.dart';
 import 'package:flutter/material.dart';
 
 final List<ChattyItem> myItems = [
-  ChattyItem.fromAssistant('Hi, I am <b><i>the</i> assistant</b>!'),
+  ChattyItem.fromAssistant(
+    'Hi, I am <b><i>the</i> assistant</b>!',
+    createdAt: DateTime(2026, 5, 15, 9, 30),
+  ),
   ChattyItem.fromAssistant(
     'Whats your <b>name</b>?',
+    createdAt: DateTime(2026, 5, 15, 10, 30),
     question: ChattyQuestion(type: ChattyQuestionType.text),
   ),
   ChattyItem.fromAssistant(
     'Date?',
+    createdAt: DateTime(2026, 5, 16, 12, 30),
     question: ChattyQuestion(type: ChattyQuestionType.date, min: '2000-01-01'),
   ),
   ChattyItem.fromAssistant(
@@ -69,7 +74,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       home: Scaffold(
-        body: SafeArea(child: ChattyWidget(onPrompt: onPrompt)),
+        body: SafeArea(
+          minimum: EdgeInsets.all(20),
+          child: ChattyWidget(onPrompt: onPrompt),
+        ),
       ),
     );
   }

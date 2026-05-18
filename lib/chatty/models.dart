@@ -49,19 +49,23 @@ class ChattyItem extends Equatable {
     required this.createdAt,
   });
 
-  factory ChattyItem.fromUser(String content) {
+  factory ChattyItem.fromUser(String content, {DateTime? createdAt}) {
     return ChattyItem(
       content: content,
       source: ChattyItemSource.user,
-      createdAt: DateTime.now(),
+      createdAt: createdAt ?? DateTime.now(),
     );
   }
 
-  factory ChattyItem.fromAssistant(String content, {ChattyQuestion? question}) {
+  factory ChattyItem.fromAssistant(
+    String content, {
+    DateTime? createdAt,
+    ChattyQuestion? question,
+  }) {
     return ChattyItem(
       content: content,
       source: ChattyItemSource.assistant,
-      createdAt: DateTime.now(),
+      createdAt: createdAt ?? DateTime.now(),
       question: question,
     );
   }

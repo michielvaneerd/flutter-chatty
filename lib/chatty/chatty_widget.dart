@@ -9,6 +9,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ChattyWidget extends StatefulWidget {
   const ChattyWidget({super.key, required this.onPrompt, this.initialItems});
 
+  static const paddingDefault = 12.0;
+  static const paddingSmall = 6.0;
+  static const paddingBig = 24.0;
+  static const borderRadiusDefault = 18.0;
+
   /// Handle new user prompt: send this prompt to the LLM api and
   /// return the response as a ChattyItem - this is up to the caller.
   final Future<ChattyItem> Function(String prompt, {String? value}) onPrompt;
@@ -79,7 +84,9 @@ class _ChattyWidgetState extends State<ChattyWidget> {
                     icon: Icon(Icons.arrow_forward_ios),
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(
+                      ChattyWidget.borderRadiusDefault,
+                    ),
                   ),
                 ),
                 controller: promptController,
