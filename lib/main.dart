@@ -29,7 +29,7 @@ var errorIsHandled = false;
 
 /// Function needs to be implemented by caller. For example send to backend.
 Future<ChattyItem> onPrompt(String prompt, {String? value}) async {
-  await Future.delayed(Duration(milliseconds: 300));
+  await Future.delayed(Duration(milliseconds: 1000));
 
   if (assistantItemIndex == 2 && !errorIsHandled) {
     // Make exception

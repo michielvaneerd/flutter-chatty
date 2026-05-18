@@ -39,7 +39,8 @@ class ChattyWidgetCubit extends Cubit<ChattyWidgetState> {
     List<ChattyItem> newItems = List.from(state.items);
 
     if (state.items.isNotEmpty && state.items.first.question != null) {
-      // This is an answer to this question. We remove the question from this item, so then it will be a normal assistant message without answering options anymore.
+      // This is an answer to this question. We remove the question from this item,
+      // so then it will be a normal assistant message without answering options anymore.
       newItems[0] = newItems.first.copyWith(removeQuestion: true);
     }
 

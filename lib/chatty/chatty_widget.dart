@@ -8,7 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ChattyWidget extends StatefulWidget {
   const ChattyWidget({super.key, required this.onPrompt, this.initialItems});
 
-  /// Handle new user prompt: send this prompt to the LLM api and return the response as a ChattyItem - this is up to the caller.
+  /// Handle new user prompt: send this prompt to the LLM api and
+  /// return the response as a ChattyItem - this is up to the caller.
   final Future<ChattyItem> Function(String prompt, {String? value}) onPrompt;
   final List<ChattyItem>? initialItems;
 
@@ -38,21 +39,29 @@ class _ChattyWidgetState extends State<ChattyWidget> {
         },
         builder: (context, state) {
           final cubit = BlocProvider.of<ChattyWidgetCubit>(context);
+          final itemCount = state.items.length;
           return Column(
             children: [
               Expanded(
                 child: ListView.builder(
                   reverse: true,
-                  itemCount: state.items.length,
+                  itemCount: itemCount + (state.busy ? 1 : 0),
                   itemBuilder: (context, index) {
-                    return ChattyItemWidget(item: state.items[index]);
+                    if (state.busy && index == 0) {
+                      return ChattyItemWidget(
+                        item: ChattyItem.fromAssistant('...'),
+                      );
+                    } else {
+                      return ChattyItemWidget(
+                        item: state.items[index - (state.busy ? 1 : 0)],
+                      );
+                    }
                   },
                 ),
               ),
-              Row(
-                children: [
-                  Expanded(child: TextField(controller: promptController)),
-                  IconButton(
+              TextField(
+                decoration: InputDecoration(
+                  suffixIcon: IconButton(
                     onPressed:
                         state.busy ||
                             (state.items.isNotEmpty &&
@@ -67,7 +76,11 @@ class _ChattyWidgetState extends State<ChattyWidget> {
                           },
                     icon: Icon(Icons.arrow_forward_ios),
                   ),
-                ],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                controller: promptController,
               ),
             ],
           );
