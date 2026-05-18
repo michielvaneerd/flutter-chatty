@@ -39,6 +39,13 @@ final List<ChattyItem> initialItems = [
   ChattyItem.fromAssistant(
     'Dat zeg ik net: ik ben de assistent!',
     createdAt: DateTime(2026, 5, 10, 11, 45),
+    documents: [
+      ChattyDocument(
+        uri: 'https://www.nu.nl',
+        type: ChattyDocumentType.url,
+        title: 'Test 123',
+      ),
+    ],
   ),
   //ChattyItem.fromDateSeparator(DateTime(2026, 5, 11)),
   ChattyItem.fromUser('Wat kun jij?', createdAt: DateTime(2026, 5, 11, 8, 15)),
@@ -98,6 +105,10 @@ class MyApp extends StatelessWidget {
           child: ChattyWidget(
             onPrompt: onPrompt,
             withDateSeparator: true,
+            withDocuments: true,
+            onDocumentClicked: (p0) {
+              print(p0);
+            },
             initialItems: initialItems.reversed.toList(),
           ),
         ),

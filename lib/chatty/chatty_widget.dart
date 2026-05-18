@@ -5,7 +5,6 @@ import 'package:chatty/chatty/chatty_widget_cubit.dart';
 import 'package:chatty/chatty/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 /// ChattyWidget is the main widget that contains the chat items and the textfield for the prompt.
 class ChattyWidget extends StatefulWidget {
@@ -14,6 +13,9 @@ class ChattyWidget extends StatefulWidget {
     required this.onPrompt,
     this.initialItems,
     this.withDateSeparator = false,
+    this.withDocuments = false,
+    this.themeData,
+    this.onDocumentClicked,
   });
 
   static const paddingDefault = 12.0;
@@ -26,6 +28,9 @@ class ChattyWidget extends StatefulWidget {
   final Future<ChattyItem> Function(String prompt, {String? value}) onPrompt;
   final List<ChattyItem>? initialItems;
   final bool withDateSeparator;
+  final bool withDocuments;
+  final ThemeData? themeData;
+  final void Function(String)? onDocumentClicked;
 
   @override
   State<ChattyWidget> createState() => _ChattyWidgetState();
@@ -42,71 +47,80 @@ class _ChattyWidgetState extends State<ChattyWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<ChattyWidgetCubit>(
-      create: (context) => ChattyWidgetCubit(
-        onPrompt: widget.onPrompt,
-        initialItems: widget.initialItems,
-        withDateSeparator: widget.withDateSeparator,
-      ),
-      child: BlocConsumer<ChattyWidgetCubit, ChattyWidgetState>(
-        listener: (context, state) {
-          // TODO: implement listener
-        },
-        builder: (context, state) {
-          final cubit = BlocProvider.of<ChattyWidgetCubit>(context);
-          return Column(
-            children: [
-              Expanded(
-                child: ListView.separated(
-                  reverse: true,
-                  itemCount: state.items.length,
-                  separatorBuilder: (context, index) {
-                    return SizedBox(height: ChattyWidget.paddingDefault);
-                  },
-                  itemBuilder: (context, index) {
-                    final item = state.items[index];
-                    if (item.source == ChattyItemSource.dateSeparator) {
-                      return ChattyDateSeparator(date: item.createdAt);
-                    } else {
-                      return ChattyItemWidget(
-                        item: item,
-                        extraWidget: index == 0 && state.busy
-                            ? ChattyAnimatedDots()
-                            : null,
-                      );
-                    }
-                  },
-                ),
-              ),
-              SizedBox(height: ChattyWidget.paddingDefault),
-              TextField(
-                decoration: InputDecoration(
-                  suffixIcon: IconButton(
-                    onPressed:
-                        state.busy ||
-                            (state.items.isNotEmpty &&
-                                state.items.first.question != null &&
-                                ChattyItemWidget.hasCustomInput(
-                                  state.items.first.question!.type,
-                                ))
-                        ? null
-                        : () {
-                            cubit.prompt(promptController.text);
-                            promptController.clear();
-                          },
-                    icon: Icon(Icons.arrow_forward_ios),
+    return Theme(
+      data: widget.themeData ?? Theme.of(context),
+      child: BlocProvider<ChattyWidgetCubit>(
+        create: (context) => ChattyWidgetCubit(
+          onPrompt: widget.onPrompt,
+          initialItems: widget.initialItems,
+          withDateSeparator: widget.withDateSeparator,
+        ),
+        child: BlocConsumer<ChattyWidgetCubit, ChattyWidgetState>(
+          listener: (context, state) {
+            // TODO: implement listener
+          },
+          builder: (context, state) {
+            final cubit = BlocProvider.of<ChattyWidgetCubit>(context);
+            return Column(
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    reverse: true,
+                    itemCount: state.items.length,
+                    separatorBuilder: (context, index) {
+                      return SizedBox(height: ChattyWidget.paddingDefault);
+                    },
+                    itemBuilder: (context, index) {
+                      final item = state.items[index];
+                      if (item.source == ChattyItemSource.dateSeparator) {
+                        return ChattyDateSeparator(date: item.createdAt);
+                      } else {
+                        return ChattyItemWidget(
+                          item: item,
+                          onDocumentClicked: widget.onDocumentClicked,
+                          withDocuments: widget.withDocuments,
+                          extraWidget: index == 0 && state.busy
+                              ? ChattyAnimatedDots(
+                                  textStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              : null,
+                        );
+                      }
+                    },
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      ChattyWidget.borderRadiusDefault,
+                ),
+                SizedBox(height: ChattyWidget.paddingDefault),
+                TextField(
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                      onPressed:
+                          state.busy ||
+                              (state.items.isNotEmpty &&
+                                  state.items.first.question != null &&
+                                  ChattyItemWidget.hasCustomInput(
+                                    state.items.first.question!.type,
+                                  ))
+                          ? null
+                          : () {
+                              cubit.prompt(promptController.text);
+                              promptController.clear();
+                            },
+                      icon: Icon(Icons.arrow_forward_ios),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        ChattyWidget.borderRadiusDefault,
+                      ),
                     ),
                   ),
+                  controller: promptController,
                 ),
-                controller: promptController,
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

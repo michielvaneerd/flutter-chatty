@@ -4,6 +4,22 @@ enum ChattyItemSource { user, assistant, dateSeparator }
 
 enum ChattyQuestionType { none, text, int, email, date, singleChoice }
 
+enum ChattyDocumentType { pdf, docx, url }
+
+class ChattyDocument extends Equatable {
+  final String uri;
+  final ChattyDocumentType type;
+  final String title;
+
+  const ChattyDocument({
+    required this.uri,
+    required this.type,
+    required this.title,
+  });
+  @override
+  List<Object?> get props => [uri, type, title];
+}
+
 class ChattyAnswer extends Equatable {
   final String value;
   final String content;
@@ -35,6 +51,8 @@ class ChattyItem extends Equatable {
   final String content;
   final ChattyItemSource source;
   final ChattyQuestion? question;
+  final List<ChattyDocument>?
+  documents; // The source of the response from the assistant for RAG usage
 
   /// If set, this is always an error.
   /// If this is not a question, then the content will contain the same string.
@@ -46,6 +64,7 @@ class ChattyItem extends Equatable {
     required this.source,
     this.question,
     this.error,
+    this.documents,
     required this.createdAt,
   });
 
@@ -67,14 +86,18 @@ class ChattyItem extends Equatable {
 
   factory ChattyItem.fromAssistant(
     String content, {
+    String? error,
     DateTime? createdAt,
     ChattyQuestion? question,
+    List<ChattyDocument>? documents,
   }) {
     return ChattyItem(
       content: content,
+      error: error,
       source: ChattyItemSource.assistant,
       createdAt: createdAt ?? DateTime.now(),
       question: question,
+      documents: documents,
     );
   }
 
@@ -92,10 +115,13 @@ class ChattyItem extends Equatable {
     );
   }
 
-  String getMainContent() {
-    return question != null ? content : (error ?? content);
-  }
-
   @override
-  List<Object?> get props => [content, source, question, error, createdAt];
+  List<Object?> get props => [
+    content,
+    source,
+    question,
+    error,
+    createdAt,
+    documents,
+  ];
 }

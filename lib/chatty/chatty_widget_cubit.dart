@@ -100,7 +100,6 @@ class ChattyWidgetCubit extends Cubit<ChattyWidgetState> {
     );
 
     final response = await onPrompt(prompt, value: value);
-
     emit(
       state.copyWith(
         items: List.from(state.items)

@@ -7,9 +7,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class ChattyItemWidget extends StatelessWidget {
-  const ChattyItemWidget({super.key, required this.item, this.extraWidget});
+  const ChattyItemWidget({
+    super.key,
+    required this.item,
+    this.extraWidget,
+    this.withDocuments = false,
+    this.onDocumentClicked,
+  });
   final ChattyItem item;
   final Widget? extraWidget;
+  final bool withDocuments;
+  final void Function(String)? onDocumentClicked;
 
   static final dateFormat = DateFormat('y-MM-dd');
 
@@ -74,7 +82,7 @@ class ChattyItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mainText = item.getMainContent();
+    final mainText = item.content;
     return Padding(
       padding: EdgeInsets.only(
         left: item.source == ChattyItemSource.assistant
@@ -112,6 +120,29 @@ class ChattyItemWidget extends StatelessWidget {
             if (mainText.isNotEmpty) ChattyRichText(text: mainText),
             ...getAnswers(context),
             ?extraWidget,
+            if (withDocuments && item.documents != null)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sources:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  ...item.documents!.map(
+                    (e) => InkWell(
+                      onTap: onDocumentClicked != null
+                          ? () {
+                              onDocumentClicked!(e.uri);
+                            }
+                          : null,
+                      child: Text(
+                        e.title,
+                        style: TextStyle(decoration: TextDecoration.underline),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             if (item.error != null)
               Row(
                 spacing: ChattyWidget.paddingDefault,

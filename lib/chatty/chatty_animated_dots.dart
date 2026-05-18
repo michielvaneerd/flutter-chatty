@@ -37,22 +37,6 @@ class _ChattyAnimatedDotsState extends State<ChattyAnimatedDots> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(List.filled(counter, '.').join(''), style: widget.textStyle);
-    // return Row(
-    //   spacing: 10,
-    //   mainAxisSize: MainAxisSize.min,
-    //   children: counter == 0
-    //       ? [SizedBox(height: 10)]
-    //       : List<Container>.generate(counter, (i) {
-    //           return Container(
-    //             width: 10,
-    //             height: 10,
-    //             decoration: BoxDecoration(
-    //               borderRadius: BorderRadius.circular(4),
-    //               color: Colors.black.withAlpha(80),
-    //             ),
-    //           );
-    //         }),
-    // );
+    return Text(List.filled(counter, '.').join(' '), style: widget.textStyle);
   }
 }
