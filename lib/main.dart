@@ -29,6 +29,25 @@ final List<ChattyItem> myItems = [
   ),
 ];
 
+final List<ChattyItem> initialItems = [
+  //ChattyItem.fromDateSeparator(DateTime(2026, 5, 10)),
+  ChattyItem.fromAssistant(
+    'Hoi ik ben de assistent! Wat kan ik voor je doen?',
+    createdAt: DateTime(2026, 5, 10, 9, 45),
+  ),
+  ChattyItem.fromUser('Wie ben jij?', createdAt: DateTime(2026, 5, 10, 10, 45)),
+  ChattyItem.fromAssistant(
+    'Dat zeg ik net: ik ben de assistent!',
+    createdAt: DateTime(2026, 5, 10, 11, 45),
+  ),
+  //ChattyItem.fromDateSeparator(DateTime(2026, 5, 11)),
+  ChattyItem.fromUser('Wat kun jij?', createdAt: DateTime(2026, 5, 11, 8, 15)),
+  ChattyItem.fromAssistant(
+    'Teveel om op te noemen...',
+    createdAt: DateTime(2026, 5, 11, 8, 46),
+  ),
+];
+
 var assistantItemIndex = -1;
 var errorIsHandled = false;
 
@@ -76,7 +95,11 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         body: SafeArea(
           minimum: EdgeInsets.all(20),
-          child: ChattyWidget(onPrompt: onPrompt, withDateSeparator: true),
+          child: ChattyWidget(
+            onPrompt: onPrompt,
+            withDateSeparator: true,
+            initialItems: initialItems.reversed.toList(),
+          ),
         ),
       ),
     );

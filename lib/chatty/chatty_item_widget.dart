@@ -77,7 +77,6 @@ class ChattyItemWidget extends StatelessWidget {
     final mainText = item.getMainContent();
     return Padding(
       padding: EdgeInsets.only(
-        bottom: ChattyWidget.paddingDefault,
         left: item.source == ChattyItemSource.assistant
             ? 0
             : ChattyWidget.paddingBig,

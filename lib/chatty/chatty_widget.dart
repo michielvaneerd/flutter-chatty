@@ -1,9 +1,11 @@
 import 'package:chatty/chatty/chatty_animated_dots.dart';
+import 'package:chatty/chatty/chatty_date_separator.dart';
 import 'package:chatty/chatty/chatty_item_widget.dart';
 import 'package:chatty/chatty/chatty_widget_cubit.dart';
 import 'package:chatty/chatty/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 /// ChattyWidget is the main widget that contains the chat items and the textfield for the prompt.
 class ChattyWidget extends StatefulWidget {
@@ -44,6 +46,7 @@ class _ChattyWidgetState extends State<ChattyWidget> {
       create: (context) => ChattyWidgetCubit(
         onPrompt: widget.onPrompt,
         initialItems: widget.initialItems,
+        withDateSeparator: widget.withDateSeparator,
       ),
       child: BlocConsumer<ChattyWidgetCubit, ChattyWidgetState>(
         listener: (context, state) {
@@ -54,19 +57,28 @@ class _ChattyWidgetState extends State<ChattyWidget> {
           return Column(
             children: [
               Expanded(
-                child: ListView.builder(
+                child: ListView.separated(
                   reverse: true,
                   itemCount: state.items.length,
+                  separatorBuilder: (context, index) {
+                    return SizedBox(height: ChattyWidget.paddingDefault);
+                  },
                   itemBuilder: (context, index) {
-                    return ChattyItemWidget(
-                      item: state.items[index],
-                      extraWidget: index == 0 && state.busy
-                          ? ChattyAnimatedDots()
-                          : null,
-                    );
+                    final item = state.items[index];
+                    if (item.source == ChattyItemSource.dateSeparator) {
+                      return ChattyDateSeparator(date: item.createdAt);
+                    } else {
+                      return ChattyItemWidget(
+                        item: item,
+                        extraWidget: index == 0 && state.busy
+                            ? ChattyAnimatedDots()
+                            : null,
+                      );
+                    }
                   },
                 ),
               ),
+              SizedBox(height: ChattyWidget.paddingDefault),
               TextField(
                 decoration: InputDecoration(
                   suffixIcon: IconButton(

@@ -1,3 +1,4 @@
+import 'package:chatty/chatty/chatty_helpers.dart';
 import 'package:chatty/chatty/models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,19 +34,48 @@ class ChattyWidgetCubit extends Cubit<ChattyWidgetState> {
     required this.onPrompt,
     this.initialItems,
     this.withDateSeparator = false,
-  }) : super(ChattyWidgetState(items: initialItems ?? []));
+  }) : super(
+         ChattyWidgetState(
+           items: _getFullItems(initialItems ?? [], withDateSeparator),
+         ),
+       );
   final Future<ChattyItem> Function(String content, {String? value}) onPrompt;
   final List<ChattyItem>? initialItems;
   final bool withDateSeparator;
 
+  static List<ChattyItem> _getFullItems(
+    List<ChattyItem> items,
+    bool withDateSeparator,
+  ) {
+    if (!withDateSeparator) {
+      return items;
+    }
+    // Items has the most recent item at index 0
+    // So instead of ADDING the date separator to the END of the list BEFORE the first message with a new date
+    final List<ChattyItem> newItems = [];
+    final Map<DateTime, bool> dates = {};
+    for (final item in items.reversed) {
+      // We reverse the list, so now the oldest entry is at index 0
+      final date = ChattyHelpers.getDate(item.createdAt);
+      if (!dates.containsKey(date)) {
+        dates[date] = true;
+        if (item.source != ChattyItemSource.dateSeparator) {
+          newItems.add(ChattyItem.fromDateSeparator(date));
+        }
+      }
+      newItems.add(item);
+    }
+    return newItems.reversed.toList();
+  }
+
   /// Handle new user prompt
   void prompt(String prompt, {String? value}) async {
-    List<ChattyItem> newItems = List.from(state.items);
+    // First make copy of current items without date separators
+    // List<ChattyItem> newItems = state.items
+    //     .where((e) => e.source != ChattyItemSource.dateSeparator)
+    //     .toList();
 
-    if (withDateSeparator) {
-      // Loop through ALL items and get each unique date and store it with the index.
-      // TODO
-    }
+    List<ChattyItem> newItems = List<ChattyItem>.from(state.items);
 
     if (state.items.isNotEmpty && state.items.first.question != null) {
       // This is an answer to this question. We remove the question from this item,
@@ -62,7 +92,12 @@ class ChattyWidgetCubit extends Cubit<ChattyWidgetState> {
       ChattyItem.fromAssistant(''),
     ); // Empty assistant message is thinking
 
-    emit(state.copyWith(busy: true, items: newItems));
+    emit(
+      state.copyWith(
+        busy: true,
+        items: _getFullItems(newItems, withDateSeparator),
+      ),
+    );
 
     final response = await onPrompt(prompt, value: value);
 
